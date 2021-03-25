@@ -1,97 +1,70 @@
-let global0=0;
-let global1=0;
-let current=0;
-let active=0;
-let flag=0;
-document.querySelector(".dice").style.display="none";
-document.querySelector(".roll").addEventListener("click",()=>{
- if (flag===0){
-    let random=Math.floor(Math.random()*6)+1;
-    if(random!=1)
-        {
-            document.querySelector(".current_"+active).textContent=random;
-            let dice= document.querySelector(".dice");
-            dice.style.display="block";
-            dice.src=`dice-${random}.png`;
-            if(active===0)
-                {
-                 global0=global0+random;
-            document.querySelector(".main_"+active).textContent=global0;   
-                }
-             else
-                {
-                 global1=global1+random;
-            document.querySelector(".main_"+active).textContent=global1;   
-                }
-            if(global0>=20)
-                { 
-                    flag=1;   
-                    document.querySelector(".player1").textContent="WINNER!";
-                      document.querySelector(".dice").style.display="none";
-                }
-            else if(global1>=20)
-                {
-                    flag=1;
-                document.querySelector(".player2").textContent="WINNER!";
-                document.querySelector(".dice").style.display="none";
-            }
-        }
-    else{
-        current=0;
-         document.querySelector(".current_"+active).textContent=current;
-        if(active===0)
-            {
-                document.querySelector('.part1').classList.remove('active');
-                document.querySelector(".part2").classList.add("active");
-                global0=0;
-                document.querySelector(".main_"+active).textContent=global0;
-                active=1;
-            }
-        else{
-                document.querySelector(".part2").classList.remove("active");
-                document.querySelector(".part1").classList.add("active");
-                global1=0;
-                document.querySelector(".main_"+active).textContent=global1;
-                active=0;
-            }
-        document.querySelector(".dice").style.display="none";
+var scores, roundScore, activePlayer, gamePlaying;
+init();
+document.querySelector(".btn-roll").addEventListener("click", function () {
+  if (gamePlaying) {
+    var dice = Math.floor(Math.random() * 6) + 1;
+    var diceDOM = document.querySelector(".dice");
+    diceDOM.style.display = "block";
+    diceDOM.src = "dice-" + dice + ".png";
+    if (dice !== 1) {
+      roundScore += dice;
+      document.querySelector(
+        "#current-" + activePlayer
+      ).textContent = roundScore;
+    } else {
+      nextPlayer();
     }
- }
+  }
 });
 
-document.querySelector(".btn").addEventListener("click",()=>{
-    global1=0;
-    global0=0;
-    current=0;
-    active=0;
-    flag=0;
-    document.querySelector(".main_0").textContent=global0;
-    document.querySelector(".main_1").textContent=global1;
-     document.querySelector(".current_0").textContent=current;
-     document.querySelector(".current_1").textContent=current;
-    document.querySelector(".player1").textContent="PLAYER 1";
-    document.querySelector(".player2").textContent="PLAYER 2";
-    document.querySelector(".part2").classList.remove("active");
-     document.querySelector(".part1").classList.add("active");
-    document.querySelector(".dice").style.display="none";
-    
-})
-document.querySelector(".hold").addEventListener("click",()=>{
-    if(flag===0)
-    {
-    current=0;
-    document.querySelector(".current_"+active).textContent=current;
-    document.querySelector(".dice").style.display="none";
-   if(active===0)
-            {
-                document.querySelector('.part1').classList.remove('active');
-                document.querySelector(".part2").classList.add("active");
-                active=1;
-            }
-    else{
-        document.querySelector('.part2').classList.remove('active');
-                document.querySelector(".part1").classList.add("active");
-                active=0;
-       }
+document.querySelector(".btn-hold").addEventListener("click", function () {
+  if (gamePlaying) {
+    scores[activePlayer] += roundScore;
+    document.querySelector("#score-" + activePlayer).textContent =
+      scores[activePlayer];
+    if (scores[activePlayer] >= 30) {
+      document.querySelector("#name-" + activePlayer).textContent = "Winner!";
+      document.querySelector(".dice").style.display = "none";
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.add("winner");
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.remove("active");
+      gamePlaying = false;
+    } else {
+      nextPlayer();
     }
-})
+  }
+});
+
+function nextPlayer() {
+  activePlayer === 0 ? (activePlayer = 1) : (activePlayer = 0);
+  roundScore = 0;
+  document.getElementById("current-0").textContent = "0";
+  document.getElementById("current-1").textContent = "0";
+  document.querySelector(".player-0-panel").classList.toggle("active");
+  document.querySelector(".player-1-panel").classList.toggle("active");
+  document.querySelector(".dice").style.display = "none";
+}
+
+document.querySelector(".btn-new").addEventListener("click", init);
+
+function init() {
+  scores = [0, 0];
+  activePlayer = 0;
+  roundScore = 0;
+  gamePlaying = true;
+  document.querySelector(".dice").style.display = "none";
+  document.getElementById("score-0").textContent = "0";
+  document.getElementById("score-1").textContent = "0";
+  document.getElementById("current-0").textContent = "0";
+  document.getElementById("current-1").textContent = "0";
+  document.getElementById("name-0").textContent = "Player 1";
+  document.getElementById("name-1").textContent = "Player 2";
+  document.querySelector(".player-0-panel").classList.remove("winner");
+  document.querySelector(".player-1-panel").classList.remove("winner");
+  document.querySelector(".player-0-panel").classList.remove("active");
+  document.querySelector(".player-1-panel").classList.remove("active");
+  document.querySelector(".player-0-panel").classList.add("active");
+}
